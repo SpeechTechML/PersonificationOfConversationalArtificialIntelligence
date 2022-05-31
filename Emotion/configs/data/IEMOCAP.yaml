@@ -1,0 +1,5 @@
+base_path: "/mnt/storage/logunov/data/nirma_2022/iemocap"
+partitions:
+  train: ""
+  test: ""
+  eval: ""

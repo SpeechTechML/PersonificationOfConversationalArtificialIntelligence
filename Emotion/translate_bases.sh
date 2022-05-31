@@ -1,0 +1,1 @@
+python3 -m cli.run "configs/tasks/nmt.yaml" --kind='en_ru'

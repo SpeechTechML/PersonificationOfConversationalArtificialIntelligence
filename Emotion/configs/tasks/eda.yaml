@@ -1,0 +1,6 @@
+# --- Explanatory data analisys config ---
+
+datasets:
+  - "DailyDialog"
+  - "MELD"
+  # - "IEMOCAP"

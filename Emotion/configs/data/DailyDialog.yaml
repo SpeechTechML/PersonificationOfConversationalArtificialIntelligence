@@ -1,0 +1,5 @@
+base_path: "/mnt/storage/logunov/data/nirma_2022/daily_dialog"
+partitions:
+  test: "test.csv"
+  eval: "val.csv"
+  train: "train.csv"

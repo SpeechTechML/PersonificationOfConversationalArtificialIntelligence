@@ -1,0 +1,14 @@
+# --- Config for datasets translation task --- 
+
+datasets:
+  - "DailyDialog"
+  - "MELD"
+  # - "IEMOCAP"
+
+task:
+  device: "cuda:0"
+  
+  model:
+    name:
+      en_ru: "Helsinki-NLP/opus-mt-en-ru"
+      ru_en: "Helsinki-NLP/opus-mt-ru-en"

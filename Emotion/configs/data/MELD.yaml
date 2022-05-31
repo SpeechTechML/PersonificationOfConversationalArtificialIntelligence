@@ -1,0 +1,17 @@
+base_path: "/mnt/storage/logunov/data/nirma_2022/meld"
+partitions:
+
+  # RU+EN Original version
+  # test: "test.csv"
+  # eval: "test.csv"
+  # train: "train.csv"
+
+  # RU With augmentations
+  # test: "test_ru_aug.csv"
+  # eval: "test_ru_aug.csv"
+  # train: "train_ru_aug.csv"
+
+  # EN With augmentations
+  test: "test_aug.csv"
+  eval: "test_aug.csv"
+  train: "train_aug.csv"
