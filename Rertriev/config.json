@@ -1,0 +1,23 @@
+{
+    "raw_data_path": "data/TlkPersonaChatRus/dialogues.tsv",
+    "proc_data_path": "data/TlkPersonaChatRus/tolokapersonachat.txt",
+    "model_path": "/home/posokhov@ad.speechpro.com/projects/models/rubert",
+    "padding_side": "right",
+    "save_model_path":"",
+    "gradient_accumulation_steps": 2,
+    "apply_interaction": 1,
+    "matching_method": "CoBERT",
+    "aggregation_method": "cls",
+    "lr": 5e-5,
+    "warmup_steps": 500,
+    "test_mode": 0,
+    "context_len": 32,
+    "responce_len": 32,
+    "persona_len": 32,
+    "train_batch_size": 16,
+    "val_batch_size": 32,
+    "epochs": 10,
+    "split": 4,
+    "has_persona": 1,
+    "log_path": "logs/syntax-bert.csv"
+}
