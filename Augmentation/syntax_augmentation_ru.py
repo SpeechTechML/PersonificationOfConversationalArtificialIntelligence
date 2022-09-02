@@ -49,6 +49,7 @@ def bild_rupersonachat(raw):
     return result
 
 def GetConsistuencyTemplate(sentence):
+    nlp = StanfordCoreNLP('http://localhost:9000')
     get_parse = nlp.annotate(sentence, properties={'annotators': 'parse','outputFormat': 'json'})
     consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
