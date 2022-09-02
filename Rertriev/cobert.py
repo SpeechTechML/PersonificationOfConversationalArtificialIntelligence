@@ -28,12 +28,12 @@ def match(model, matching_method, x, y, x_mask, y_mask):
     m = x.shape[1]
     n = y.shape[1]
     attn_mask = torch.bmm(x_mask.unsqueeze(-1), y_mask.unsqueeze(1))  # (batch_size, m, n)
-    attn = torch.bmm(x, y.transpose(1, 2)) # (batch_size, m, n)
+    attn = torch.bmm(x, y.transpose(1, 2))  # (batch_size, m, n)
     model.attn = attn
     model.attn_mask = attn_mask
 
     x_to_y = torch.softmax(attn * attn_mask + (-5e4) * (1-attn_mask), dim=2)  # (batch_size, m, n)
-    y_to_x = torch.softmax(attn * attn_mask + (-5e4) * (1-attn_mask), dim=1).transpose(1,2)  # # (batch_size, n, m)
+    y_to_x = torch.softmax(attn * attn_mask + (-5e4) * (1-attn_mask), dim=1).transpose(1, 2)  # # (batch_size, n, m)
 
     # x_attended, y_attended = None, None # no hop-1
     x_attended = torch.bmm(x_to_y, y)  # (batch_size, m, hidden_size)
@@ -66,16 +66,17 @@ def aggregate(model, aggregation_method, x, x_mask):
     if aggregation_method == "max":
         return x.masked_fill(x_mask.unsqueeze(-1) == 0, -5e4).max(dim=1)[0]  # (batch_size, emb_size)
     if aggregation_method == "mean_max":
-        return torch.cat([(x * x_mask.unsqueeze(-1)).sum(dim=1)/x_mask.sum(dim=-1, keepdim=True).clamp(min=1), \
-            x.masked_fill(x_mask.unsqueeze(-1) == 0, -5e4).max(dim=1)[0]], dim=-1)  # (batch_size, 2*emb_size)
+        return torch.cat([(x * x_mask.unsqueeze(-1)).sum(dim=1)/x_mask.sum(dim=-1, keepdim=True).clamp(min=1),
+                          x.masked_fill(x_mask.unsqueeze(-1) == 0, -5e4).max(dim=1)[0]], dim=-1)  # (batch_size, 2*emb_size)
     if aggregation_method == "cls":
         return x[:, 0]  # (batch_size, emb_size)
     if aggregation_method == "cls_gpt":
         return x[:, -1]  # (batch_size, emb_size)
 
 
-def fuse(model, matching_method, aggregation_method, batch_x_emb, batch_y_emb, batch_persona_emb, \
-    batch_x_mask, batch_y_mask, batch_persona_mask, batch_size, num_candidates):
+def fuse(model, matching_method, aggregation_method, batch_x_emb, batch_y_emb, batch_persona_emb,
+         batch_x_mask, batch_y_mask, batch_persona_mask, batch_size, num_candidates
+         ):
 
     batch_x_emb, batch_y_emb_context = match(model, matching_method, batch_x_emb, batch_y_emb, batch_x_mask, batch_y_mask)
     # batch_x_emb: ((batch_size*num_candidates, m, emb_size), (batch_size*num_candidates, emb_size))
@@ -105,13 +106,13 @@ def fuse(model, matching_method, aggregation_method, batch_x_emb, batch_y_emb, b
         # return torch.bmm(torch.cat([batch_x_emb, batch_persona_emb], dim=-1).unsqueeze(1), \
         #             torch.cat([batch_y_emb_context, batch_y_emb_persona], dim=-1)\
         #                 .unsqueeze(-1)).reshape(batch_size, num_candidates)
-        return torch.bmm(torch.cat([batch_x_emb, batch_x_emb_2hop, batch_persona_emb, batch_persona_emb_2hop], dim=-1).unsqueeze(1), \
-                    torch.cat([batch_y_emb_context, batch_y_emb_context_2hop, batch_y_emb_persona, batch_y_emb_persona_2hop], dim=-1)\
-                        .unsqueeze(-1)).reshape(batch_size, num_candidates)
+        return torch.bmm(torch.cat([batch_x_emb, batch_x_emb_2hop, batch_persona_emb, batch_persona_emb_2hop], dim=-1).unsqueeze(1),
+                         torch.cat([batch_y_emb_context, batch_y_emb_context_2hop, batch_y_emb_persona, batch_y_emb_persona_2hop], dim=-1)
+                         .unsqueeze(-1)).reshape(batch_size, num_candidates)
     else:
-        return torch.bmm(torch.cat([batch_x_emb, batch_x_emb_2hop], dim=-1).unsqueeze(1), \
-                    torch.cat([batch_y_emb_context, batch_y_emb_context_2hop], dim=-1)\
-                        .unsqueeze(-1)).reshape(batch_size, num_candidates)
+        return torch.bmm(torch.cat([batch_x_emb, batch_x_emb_2hop], dim=-1).unsqueeze(1),
+                         torch.cat([batch_y_emb_context, batch_y_emb_context_2hop], dim=-1)
+                         .unsqueeze(-1)).reshape(batch_size, num_candidates)
 
 
 def dot_product_loss(batch_x_emb, batch_y_emb):
@@ -139,8 +140,9 @@ def dot_product_loss(batch_x_emb, batch_y_emb):
 # title train
 
 
-def train_epoch(data_iter, models, has_persona, optimizers, schedulers, gradient_accumulation_steps, device, fp16, amp, \
-    apply_interaction, matching_method, aggregation_method):
+def train_epoch(data_iter, models, has_persona, optimizers, schedulers, gradient_accumulation_steps, device, fp16, amp,
+                apply_interaction, matching_method, aggregation_method
+                ):
     models = [i.to(device) for i in models]
     epoch_loss = []
     ok = 0
@@ -199,8 +201,8 @@ def train_epoch(data_iter, models, has_persona, optimizers, schedulers, gradient
             # context-response attention
             batch_y_emb = batch_y_emb.unsqueeze(0).repeat(batch_size, 1, 1, 1).reshape(-1, sent_len, emb_size)  # (batch_size*num_candidates, sent_len, emb_size)
             batch_y_mask = batch_y_mask.unsqueeze(0).repeat(batch_size, 1, 1).reshape(-1, sent_len)  # (batch_size*num_candidates, sent_len)
-            logits = fuse(context_model, matching_method, aggregation_method, \
-                batch_x_emb, batch_y_emb, batch_persona_emb, batch_x_mask, batch_y_mask, batch_persona_mask, batch_size, num_candidates)
+            logits = fuse(context_model, matching_method, aggregation_method,
+                          batch_x_emb, batch_y_emb, batch_persona_emb, batch_x_mask, batch_y_mask, batch_persona_mask, batch_size, num_candidates)
 
             # compute loss
             targets = torch.arange(batch_size, dtype=torch.long, device=batch_x['input_ids'].device)
@@ -249,8 +251,8 @@ def train_epoch(data_iter, models, has_persona, optimizers, schedulers, gradient
 # eval
 
 
-def evaluate_epoch(data_iter, models, has_persona, gradient_accumulation_steps, device, epoch, \
-    apply_interaction, matching_method, aggregation_method):
+def evaluate_epoch(data_iter, models, has_persona, gradient_accumulation_steps, device, epoch,
+                   apply_interaction, matching_method, aggregation_method):
     models = [i.to(device) for i in models]
     epoch_loss = []
     ok = 0
@@ -336,8 +338,8 @@ def evaluate_epoch(data_iter, models, has_persona, gradient_accumulation_steps, 
                     if has_persona:
                         persona_emb = batch_persona_emb[i:i+1].repeat_interleave(num_candidates, dim=0)
                         persona_mask = batch_persona_mask[i:i+1].repeat_interleave(num_candidates, dim=0)
-                    logits_single = fuse(context_model, matching_method, aggregation_method, \
-                        x_emb, batch_y_emb, persona_emb, x_mask, batch_y_mask, persona_mask, 1, num_candidates).reshape(-1)
+                    logits_single = fuse(context_model, matching_method, aggregation_method,
+                                         x_emb, batch_y_emb, persona_emb, x_mask, batch_y_mask, persona_mask, 1, num_candidates).reshape(-1)
 
                     logits.append(logits_single)
                 logits = torch.stack(logits, dim=0)

@@ -27,18 +27,18 @@ def tokenize(inp, tokenizer=False, max_len=32, join_token=False, type='gpt2'):
     out = tokenizer(out, padding='max_length', max_length=max_len, truncation=True, return_tensors="pt")
     if type == 'bert':
         if padding_side == 'left':
-            out = {k:out[k][:,-max_len:] for k in out}
+            out = {k: out[k][:, -max_len:] for k in out}
         elif padding_side == 'right':
-            out = {k:out[k][:,:max_len] for k in out}
+            out = {k: out[k][:, :max_len] for k in out}
         else:
             print('error')
         for k in out:
             cls_padder = torch.ones_like(out[k][:, :1])*cls_id
-            out[k][:,:1] = torch.where((out[k][:, :1] != pad_id), cls_padder, out[k][:,:1])
+            out[k][:, :1] = torch.where((out[k][:, :1] != pad_id), cls_padder, out[k][:, :1])
             out[k] = out[k].type(torch.IntTensor)
     elif type == 'bert_rcls':
         if type == 'bert':
-            out = {k:out[k][:,-max_len:] for k in out}
+            out = {k: out[k][:, -max_len:] for k in out}
         for k in out:
             cls_padder = torch.ones_like(out[k][:, -1:])*cls_id
             out[k][:, :1] = torch.where((out[k][:, -1:] != pad_id), cls_padder, out[k][:, -1:])

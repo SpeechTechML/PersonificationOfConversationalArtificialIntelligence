@@ -9,6 +9,7 @@ from cobert import match, aggregate, fuse, dot_product_loss, train_epoch, evalua
 from dataset import PersonaChatTorchDataset, clf, tokenize
 from util import logger
 
+
 def run(train, val, models, lr, t_total, epochs, has_persona, gradient_accumulation_steps, device, fp16,
         amp, apply_interaction, matching_method, aggregation_method, epoch_train_losses, epoch_valid_losses,
         epoch_valid_accs, epoch_valid_recalls, epoch_valid_MRRs, best_model_statedict, writer=None, save_model_path=False, test_mode=False):
@@ -55,7 +56,7 @@ def run(train, val, models, lr, t_total, epochs, has_persona, gradient_accumulat
                                                                           matching_method=matching_method, aggregation_method=aggregation_method
                                                                           )
         print("Epoch {0}: train loss: {1:.4f}, valid loss: {2:.4f}, train_acc: {3:.4f}, valid acc: {4:.4f}, valid recall: {5}, valid_MRR: {6:.4f}"
-            .format(epoch+1, train_loss, valid_loss, train_acc, valid_acc, valid_recall, valid_MRR))
+              .format(epoch+1, train_loss, valid_loss, train_acc, valid_acc, valid_recall, valid_MRR))
         if writer is not None:
             writer.writerow({'epoch': epoch+1, 'train_loss': train_loss, 'valid_loss': valid_loss, 'train_acc': train_acc,
                              'valid_acc': valid_acc, 'valid_r1': valid_recall[0], 'valid_r5': valid_recall[1], 'valid_r10': valid_recall[2], 'valid_MRR': valid_MRR})

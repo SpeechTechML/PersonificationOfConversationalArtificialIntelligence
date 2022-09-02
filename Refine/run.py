@@ -80,8 +80,9 @@ def run(model_name="t5-base", is_causal_lm=False, max_length=128):
                                                shuffle=True, num_workers=0,
                                                collate_fn=collate_fn(config, train, tokenizer))
     val_loader = torch.utils.data.DataLoader(val, batch_size=config['batch_size'],
-                                               shuffle=True, num_workers=0,
-                                               collate_fn=collate_fn(config, val, tokenizer))
+                                             shuffle=True, num_workers=0,
+                                             collate_fn=collate_fn(config, val, tokenizer)
+                                             )
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
