@@ -11,17 +11,18 @@ attacker = OpenAttack.attackers.SCPNAttacker()
 
 
 def GetConsistuencyTemplate(sentence):
-    get_parse = nlp.annotate(sentence, properties={'annotators': 'parse','outputFormat': 'json'})
+    get_parse = nlp.annotate(sentence, properties={'annotators': 'parse', 'outputFormat': 'json'})
     consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
     return tree_template + " EOP"
+
 
 def GetAllTemplates(dialogs):
     all_templates = []
     i = 0
     for i in range(len(dialogs)):
         all_templates.append(GetConsistuencyTemplate(json.loads(dialogs[i])['responce']))
-    return  all_templates
+    return all_templates
 
 
 def rli(inp):
@@ -69,7 +70,7 @@ def SaveReplicsNumberByPerson(dialogs):
         values = []
         print(i)
         for j in range(len(dialogs)):
-            if j!=i:
+            if j != i:
                 try:
                     if json.loads(dialogs[i])['persona'] == json.loads(dialogs[j])['persona']:
                         values.append(j)
@@ -91,12 +92,13 @@ i = 0
 for i in range(len(dialogs)):
     responce_templates = []
     for number in number_dictionary[i]:
-      responce_templates.append(templates[number])
+        responce_templates.append(templates[number])
     responce_templates = process.dedupe(responce_templates, threshold=98)
     if len(responce_templates) >= 5:
         responce_templates = responce_templates[0:4]
     dialog_line = json.loads(dialogs[i])
-    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'],
+                                                          responce_templates)
     sorted_json = json.dumps(dialog_line, sort_keys=True)
     with open("aug_personachat/test_both_original_aug.json", 'a') as result:
-        result.write(sorted_json +'\n')
+        result.write(sorted_json + '\n')

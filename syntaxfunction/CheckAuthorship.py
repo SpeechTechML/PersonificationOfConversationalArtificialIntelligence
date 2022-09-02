@@ -3,6 +3,7 @@ from nltk import pos_tag, Text
 import json
 from collections import Counter
 
+
 def checkAuthorship(replica, dialogs):
     count_word = len(word_tokenize(replica))
     count_sent = len(sent_tokenize(replica))
@@ -48,4 +49,6 @@ def checkAuthorship(replica, dialogs):
                 name = str(json.loads(line)["name"])
     print("This replica looks like %s person" % name)
     print(sum_diff)
+
+
 checkAuthorship("how are you ? being an old man , i am slowing down these days", "persons.json")

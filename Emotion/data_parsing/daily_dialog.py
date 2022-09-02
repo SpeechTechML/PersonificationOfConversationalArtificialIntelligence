@@ -1,5 +1,5 @@
 import os
-import sys 
+import sys
 import getopt
 
 import pandas as pd
@@ -30,16 +30,17 @@ def parse_data(in_dir, out_path):
     in_act = open(act_dir, 'r')
 
     items = []
-    for dia_id, (line_dial, line_emo, line_act) in enumerate(zip(in_dial, in_emo, in_act)):
+    for dia_id, (line_dial, line_emo, line_act)\
+            in enumerate(zip(in_dial, in_emo, in_act)):
         seqs = line_dial.split('__eou__')[:-1]
         emos = line_emo.split(' ')[:-1]
         acts = line_act.split(' ')[:-1]
-        
         seq_len = len(seqs)
         emo_len = len(emos)
         act_len = len(acts)
         if seq_len != emo_len or seq_len != act_len:
-            print("Different turns btw dialogue & emotion & acttion! ", dia_id + 1, seq_len, emo_len, act_len)
+            print("Different turns btw dialogue & emotion & acttion! ",
+                  dia_id + 1, seq_len, emo_len, act_len)
             sys.exit()
 
         for utt_id, (utt, emo, act) in enumerate(zip(seqs, emos, acts)):
@@ -54,11 +55,9 @@ def parse_data(in_dir, out_path):
 
     data_df = pd.DataFrame(items)
     data_df.to_csv(out_path)
-    
     in_dial.close()
     in_emo.close()
     in_act.close()
-
 
 
 def main(argv):
@@ -67,7 +66,7 @@ def main(argv):
     out_dir = ''
 
     try:
-        opts, args = getopt.getopt(argv,"h:i:o:",["in_dir=","out_dir="])
+        opts, args = getopt.getopt(argv, "h:i:o:", ["in_dir=", "out_dir="])
     except getopt.GetoptError:
         print("python3 parser.py -i <in_dir> -o <out_dir>")
         sys.exit(2)
@@ -81,6 +80,7 @@ def main(argv):
             out_dir = arg
 
     parse_data(in_dir, out_dir)
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])

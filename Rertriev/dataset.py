@@ -4,10 +4,14 @@ import random
 import torch
 import transformers
 import numpy as np
+
+
 def load_toloka(path):
     with open(path, 'r', encoding='utf-8') as data:
         for line in data:
             yield json.loads(line)
+
+
 def tokenize(inp, tokenizer=False, max_len=32, join_token=False, type='gpt2'):
     '''
     tokenizer funk for PersonaChatTorchDataset and PersonaChatLazyDataset
@@ -17,9 +21,9 @@ def tokenize(inp, tokenizer=False, max_len=32, join_token=False, type='gpt2'):
     if tokenizer:
         padding_side = tokenizer.padding_side
     if join_token:
-        out=join_token.join(inp)
+        out = join_token.join(inp)
     else:
-        out = inp 
+        out = inp
     out = tokenizer(out, padding='max_length', max_length=max_len, truncation=True, return_tensors="pt")
     if type == 'bert':
         if padding_side == 'left':
@@ -29,17 +33,19 @@ def tokenize(inp, tokenizer=False, max_len=32, join_token=False, type='gpt2'):
         else:
             print('error')
         for k in out:
-            cls_padder = torch.ones_like(out[k][:,:1])*cls_id
-            out[k][:,:1] = torch.where((out[k][:,:1]!=pad_id), cls_padder, out[k][:,:1])
+            cls_padder = torch.ones_like(out[k][:, :1])*cls_id
+            out[k][:,:1] = torch.where((out[k][:, :1] != pad_id), cls_padder, out[k][:,:1])
             out[k] = out[k].type(torch.IntTensor)
     elif type == 'bert_rcls':
         if type == 'bert':
             out = {k:out[k][:,-max_len:] for k in out}
         for k in out:
-            cls_padder = torch.ones_like(out[k][:,-1:])*cls_id
-            out[k][:,:1] = torch.where((out[k][:,-1:]!=pad_id), cls_padder, out[k][:,-1:])
+            cls_padder = torch.ones_like(out[k][:, -1:])*cls_id
+            out[k][:, :1] = torch.where((out[k][:, -1:] != pad_id), cls_padder, out[k][:, -1:])
             out[k] = out[k].type(torch.IntTensor)
     return out
+
+
 class PersonaChatLazyDataset():
     def __init__(self, path, tokenizer_func=False, tokenizer=False, batch_size=32, context_len=32, responce_len=32, persona_len=32):
         self.path = path
@@ -49,13 +55,14 @@ class PersonaChatLazyDataset():
         self.context_len = context_len
         self.responce_len = responce_len
         self.persona_len = persona_len
+
     def __iter__(self):
         with open(self.path, 'r', encoding='utf-8') as data:
             batch = None
             for line in data:
                 x = json.loads(line)
                 if batch is None:
-                    batch = {k:[x[k]] for k in x}
+                    batch = {k: [x[k]] for k in x}
                 else:
                     for k in x:
                         batch[k].append(x[k])
@@ -76,14 +83,18 @@ class PersonaChatLazyDataset():
                             batch[k] = self.tokenizer_func(batch[k], tokenizer=self.tokenizer, max_len=max_len, join_token=join_token)
                     yield batch, batch.pop('label')
                     batch = None
+
     def __next__(self):
         return json.loads(self.data.__next__())
+
     def __len__(self):
         c = 0
         for _ in self:
-            c+=1
+            c += 1
             print(c)
         return c
+
+
 def clf(inp, tokenizer_func, tokenizer=False, context_len=32, responce_len=32, persona_len=32):
     '''
     collate_fn for PersonaChatTorchDataset.
@@ -122,19 +133,19 @@ def clf(inp, tokenizer_func, tokenizer=False, context_len=32, responce_len=32, p
                         line[k] = [line[k]]
                         continue
                     tokens = tokenizer_func(line[k], tokenizer=tokenizer, max_len=max_len, join_token=join_token)
-                    line[k] = {inp_type:tokens[inp_type][:32] for inp_type in tokens} #КОСТЫЛЬ
+                    line[k] = {inp_type: tokens[inp_type][: 32] for inp_type in tokens}  # КОСТЫЛЬ
                 try:
                     line.pop('responce_aug')
                     line.pop('persona_aug')
                 except KeyError:
                     pass
-                #print(line.keys())
+                # print(line.keys())
                 if batch is None:
                     batch = line
                 else:
                     for k in line:
                         if k == 'label':
-                            batch[k]+=line[k]
+                            batch[k] += line[k]
                         else:
                             for inp_type in line[k]:
                                 batch[k][inp_type] = torch.cat((batch[k][inp_type], (line[k][inp_type])), 0)
@@ -143,12 +154,14 @@ def clf(inp, tokenizer_func, tokenizer=False, context_len=32, responce_len=32, p
             pass
     return batch, batch.pop('label')
 
+
 class PersonaChatTorchDataset(torch.utils.data.Dataset):
-    def __init__(self, path): #, tokenizer_func=False, tokenizer=False, batch_size=32, context_len=32, responce_len=32, persona_len=32
+    def __init__(self, path):  # , tokenizer_func=False, tokenizer=False, batch_size=32, context_len=32, responce_len=32, persona_len=32
         with open(path, 'r', encoding='utf-8') as data:
             self.data = data.readlines()
+
     def __len__(self):
         return len(self.data)
-    
+
     def __getitem__(self, idx):
         return self.data[idx]

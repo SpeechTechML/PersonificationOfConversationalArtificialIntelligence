@@ -11,7 +11,6 @@ def parse_data(in_path: str, out_path: str):
     dirname = os.path.dirname(out_path)
     if not os.path.exists(dirname):
         os.makedirs(dirname)
-    
     in_df.to_csv(out_path, index=False)
 
 

@@ -1,6 +1,4 @@
 import warnings
-warnings.filterwarnings('ignore')
-
 import os
 import tqdm
 import random
@@ -19,7 +17,7 @@ from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from utils.base import set_seed, str_to_python
 from utils.task import Task
 from utils.label_encoder import LabelEncoderWithFitCheck
-
+warnings.filterwarnings('ignore')
 
 
 class TrainTask(Task):
@@ -35,10 +33,9 @@ class TrainTask(Task):
             config['task']['label_encoder']['save_dir']
         )
 
-
     def _tokenize_function(self, examples):
-        return self.tokenizer(examples['text'], padding='max_length', truncation=True)
-
+        return self.tokenizer(examples['text'], padding='max_length',
+                              truncation=True)
 
     def _compute_metrics(self, eval_pred: Tuple[Iterable, Iterable]):
         logits, labels = eval_pred
@@ -50,13 +47,12 @@ class TrainTask(Task):
         }
         return metrics
 
-
     def _preprocess_dataset(self, df_dataset: pd.DataFrame) -> pd.DataFrame:
         """ Renames columns and encodes labels """
 
         # Edit columns and order
         df_dataset.rename(columns={
-            'emo': 'label', 
+            'emo': 'label',
             'emotion': 'label',
             'dialogue_id': 'dia_id',
             'utterance_id': 'utt_id',
@@ -70,21 +66,22 @@ class TrainTask(Task):
         else:
             df_dataset['label'] = self.le.fit_transform(df_dataset['label'])
 
-        # Convert columns with '_aug' to pythonic list notation (instead of pandas-converted string)
+        # Convert columns with '_aug' to pythonic list notation
+        # (instead of pandas-converted string)
         df_dataset['utterance_aug'] = df_dataset['utterance_aug'].apply(str_to_python)
 
         return df_dataset
 
-
     def _extract_dialogue_contexts(
-        self, 
-        df_dataset: pd.DataFrame, 
-        ds_name: str, 
+        self,
+        df_dataset: pd.DataFrame,
+        ds_name: str,
         aug_factor: int = 1
-        ) -> pd.DataFrame:
-        """ 
-        Extracts dialogues contexts for each utterance and corresponding targets
-        using augmentations (if aug_factor > 1). 
+    ) -> pd.DataFrame:
+        """
+        Extracts dialogues contexts for each utterance
+         and corresponding targets
+        using augmentations (if aug_factor > 1).
         """
 
         dset_config = self.config['task']['dataset']
@@ -97,7 +94,7 @@ class TrainTask(Task):
             print(f"Aug iteration: {aug_iter + 1}/{aug_factor}")
 
             for i in tqdm.tqdm(range(df_dataset.shape[0]), desc=ds_name):
-                curr_row =  df_dataset.iloc[i,:]
+                curr_row = df_dataset.iloc[i, :]
                 current_dialogue_id = curr_row['dia_id']
                 current_context = []
 
@@ -107,24 +104,24 @@ class TrainTask(Task):
 
                     # Check if index is not out of bounds
                     if curr_index >= 0:
-                        row = df_dataset.iloc[curr_index,:]
+                        row = df_dataset.iloc[curr_index, :]
 
                         # Check if current context's dia_id is the same as original's one
                         if row['dia_id'] == current_dialogue_id:
                             # utterance = row['utterance'] # <-- For ENG
-                            utterance = row['translated_utterance'] # <-- For RUS
+                            utterance = row['translated_utterance']  # <-- For RUS
 
                             if aug_factor > 1:
                                 try:
                                     if random.random() < 0.5:
-                                        # Randomly choice from presented augmentations 
+                                        # Randomly choice from presented augmentations
                                         # in column 'utterance_aug' for current utterance.
                                         utterance = random.choice(row['utterance_aug'])
                                 except IndexError:
                                     pass
-                                
+
                             current_context.append(utterance)
-                
+
                 current_context = f' {sep_token} '.join(current_context)
                 contexts.append(current_context)
                 labels.append(curr_row['label'])
@@ -134,7 +131,6 @@ class TrainTask(Task):
         res_df['text'] = contexts
         res_df['label'] = labels
         return res_df
-
 
     def _setup_datasets(self):
         """ Prepares train and eval datasets """
@@ -153,11 +149,11 @@ class TrainTask(Task):
                 aug_factor = self.config['task']['dataset']['aug_factor'] if partition == 'train' else 1
                 df_dataset = self._preprocess_dataset(df_dataset)
                 df_dataset = self._extract_dialogue_contexts(
-                    df_dataset  = df_dataset, 
-                    ds_name     = f"{base_name}/{partition}", 
-                    aug_factor  = aug_factor
+                    df_dataset=df_dataset,
+                    ds_name=f"{base_name}/{partition}",
+                    aug_factor=aug_factor
                 )
-                df_data = df_dataset.loc[:,['text', 'label']].to_dict('list')
+                df_data = df_dataset.loc[:, ['text', 'label']].to_dict('list')
 
                 # Concatenate to already prepared data
                 if dset_dict[partition] is None:
@@ -170,17 +166,16 @@ class TrainTask(Task):
         for part in dset_dict.keys():
             dset_dict[part] = Dataset.from_dict(dset_dict[part]) \
                 .map(
-                    self._tokenize_function, 
-                    batched     = True, 
-                    batch_size  = self.config['task']['dataset']['batch_size']
+                    self._tokenize_function,
+                    batched=True,
+                    batch_size=self.config['task']['dataset']['batch_size']
                 ) \
                 .shuffle()
         return dset_dict
 
-
     def _setup_task(self) -> Trainer:
-        """ 
-        Composes previous stages 
+        """
+        Composes previous stages
         (dataset preprocessing, dialogue contexts extraction, etc.)
         and returns Trainer object.
         """
@@ -190,17 +185,16 @@ class TrainTask(Task):
         self.le.save()
 
         training_args = TrainingArguments(**self.config['task']['training_args'])
-    
+
         print("Training.")
         trainer = Trainer(
-            model = self.model,
-            args = training_args,
-            train_dataset = datasets['train'],
-            eval_dataset = datasets['eval'],
-            compute_metrics = self._compute_metrics
+            model=self.model,
+            args=training_args,
+            train_dataset=datasets['train'],
+            eval_dataset=datasets['eval'],
+            compute_metrics=self._compute_metrics
         )
         return trainer
-
 
     def run(self, random_seed: int):
         set_seed(random_seed)

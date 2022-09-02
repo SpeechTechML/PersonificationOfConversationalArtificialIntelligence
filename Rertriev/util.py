@@ -5,16 +5,20 @@ import os
 import csv
 import json
 
+
 def save_pickle(obj, path):
     with open(path, "wb") as f:
         pickle.dump(obj, f)
+
 
 def load_pickle(path):
     with open(path, "rb") as f:
         return pickle.load(f)
 
+
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
 
 def compute_metrics(batch_x_emb, batch_y_emb):
     """
@@ -22,7 +26,7 @@ def compute_metrics(batch_x_emb, batch_y_emb):
         if batch_x_emb.dim() == 2:
             # batch_x_emb: (batch_size, emb_size)
             # batch_y_emb: (batch_size, emb_size)
-        
+
         if batch_x_emb.dim() == 3:
             # batch_x_emb: (batch_size, batch_size, emb_size), the 1st dim is along examples and the 2nd dim is along candidates
             # batch_y_emb: (batch_size, emb_size)
@@ -30,9 +34,9 @@ def compute_metrics(batch_x_emb, batch_y_emb):
     batch_size = batch_x_emb.size(0)
     targets = torch.arange(batch_size, device=batch_x_emb.device)
     if batch_x_emb.dim() == 2:
-        dot_products = batch_x_emb.mm(batch_y_emb.t()) # (batch_size, batch_size)
+        dot_products = batch_x_emb.mm(batch_y_emb.t())  # (batch_size, batch_size)
     elif batch_x_emb.dim() == 3:
-        dot_products = torch.bmm(batch_x_emb, batch_y_emb.unsqueeze(0).repeat(batch_size, 1, 1).transpose(1,2))[:, targets, targets]
+        dot_products = torch.bmm(batch_x_emb, batch_y_emb.unsqueeze(0).repeat(batch_size, 1, 1).transpose(1, 2))[:, targets, targets]
 
     # dot_products: (batch_size, batch_size)
     sorted_indices = dot_products.sort(descending=True)[1]
@@ -47,11 +51,11 @@ def compute_metrics(batch_x_emb, batch_y_emb):
     for k in ks:
         # sorted_indices[:,:k]: (batch_size, k)
         num_ok = 0
-        for tgt, topk in zip(targets, sorted_indices[:,:k].tolist()):
+        for tgt, topk in zip(targets, sorted_indices[:, :k].tolist()):
             if tgt in topk:
                 num_ok += 1
         recall_k.append(num_ok/batch_size)
-    
+
     # MRR
     MRR = 0
     for tgt, topk in zip(targets, sorted_indices.tolist()):
@@ -64,15 +68,15 @@ def compute_metrics(batch_x_emb, batch_y_emb):
 def compute_metrics_from_logits(logits, targets):
     """
         recall@k for N candidates
-        
+
             logits: (batch_size, num_candidates)
             targets: (batch_size, )
     """
     batch_size, num_candidates = logits.shape
-    
+
     sorted_indices = logits.sort(descending=True)[1]
     targets = targets.tolist()
-    
+
     recall_k = []
     if num_candidates <= 10:
         ks = [1, max(1, round(num_candidates*0.2)), max(1, round(num_candidates*0.5))]
@@ -83,11 +87,11 @@ def compute_metrics_from_logits(logits, targets):
     for k in ks:
         # sorted_indices[:,:k]: (batch_size, k)
         num_ok = 0
-        for tgt, topk in zip(targets, sorted_indices[:,:k].tolist()):
+        for tgt, topk in zip(targets, sorted_indices[:, :k].tolist()):
             if tgt in topk:
                 num_ok += 1
         recall_k.append(num_ok/batch_size)
-    
+
     # MRR
     MRR = 0
     for tgt, topk in zip(targets, sorted_indices.tolist()):
@@ -96,11 +100,12 @@ def compute_metrics_from_logits(logits, targets):
     MRR = MRR/batch_size
     return recall_k, MRR
 
+
 def logger(config, inp, name='new', path='logs', new=False):
     '''
     config - dict for dir name
     inp - {batch_n:int, train:float, val:float, *metrics:float}
-    log = {final_score: {batch_n:int, train:float, MIN(val:float), *metrics:float}, 
+    log = {final_score: {batch_n:int, train:float, MIN(val:float), *metrics:float},
            best_metrics:{MAX(batch_n:int), MIN(train:float), MIN(val:float), *MAX(metrics:float)}}.json
     best_metrics not relised yet
     '''
@@ -129,5 +134,5 @@ def logger(config, inp, name='new', path='logs', new=False):
             writer.writerow(inp)
         # log
         with open(os.path.join(dirname, 'log.json'), 'w') as log:
-            out_log = {'final_score':inp, 'config':config}
+            out_log = {'final_score': inp, 'config': config}
             json.dump(out_log, log)
