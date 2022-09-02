@@ -6,7 +6,8 @@ from transformers import get_scheduler
 from sklearn.metrics import f1_score, recall_score
 from tqdm.notebook import tqdm
 
-def config_training(model, train_loader, layers, 
+
+def config_training(model, train_loader, layers,
                     lr, num_epochs, num_warmup_steps):
     if layers != None:
         for i, param in model.named_parameters():
@@ -38,7 +39,7 @@ def compute_bleu_f1(model, tokenizer, inputs, labels):
         top_p=0.9,
         no_repeat_ngram_size=3
     ).to('cpu').detach().numpy()
-    
+
     preds = list(preds)
     str_preds = []
     str_labels = []
@@ -47,7 +48,7 @@ def compute_bleu_f1(model, tokenizer, inputs, labels):
         for j in range(len(preds[i])):
             line.append(str(preds[i][j]))
         str_preds.append(line)
-            
+
     for i in range(len(labels)):
         line = []
         for j in range(len(labels[i])):
@@ -66,9 +67,9 @@ def compute_bleu_f1(model, tokenizer, inputs, labels):
         results['f1'].append(f1_score(label, pred, average='macro'))
         results['recall'].append(recall_score(label, pred, average='macro'))
     return results
-    
 
-def eval_model(model, tokenizer, val_loader, 
+
+def eval_model(model, tokenizer, val_loader,
                device, skip_generation=False):
     print("Validation")
     losses = []
@@ -117,7 +118,7 @@ def train_model(model, tokenizer, train_loader, val_loader,
         print("Training")
         progress_bar = tqdm(range(len(train_loader)))
         optimizer.zero_grad()
-        
+
         i = 1
         model.train()
         for batch in train_loader:
@@ -125,13 +126,13 @@ def train_model(model, tokenizer, train_loader, val_loader,
             outputs = model(**batch)
             loss = outputs.loss / accumulation_steps
             loss.backward()
-            
+
             if i % accumulation_steps == 0:
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
-                
+
             progress_bar.update(1)
             i += 1
-        
+
         eval_model(model, tokenizer, val_loader, skip_generation=True)

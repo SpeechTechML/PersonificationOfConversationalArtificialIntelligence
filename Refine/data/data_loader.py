@@ -1,13 +1,13 @@
-import pandas as pd  
+import pandas as pd
 
 
 def load_data(data_path):
-    #To load corrected with Yandex.Speller .txt data
+    # To load corrected with Yandex.Speller .txt data
     if data_path[-3:] == 'txt':
         with open(data_path, 'r', encoding="utf-8") as infile:
             return infile.readlines()
 
-    #To load raw data
+    # To load raw data
     data = pd.read_csv(data_path, header=0, delimiter='\t')
     result = []
 
@@ -72,7 +72,7 @@ def preprocess_data(config):
                 d_len = max_length*2 - len(persona2)
                 your_persona = persona2
                 persona_id = "<p2>"
-            
+
             label = you_token + dialogue[i + 1][4:]
             dialogue_history = ""
 
@@ -86,14 +86,14 @@ def preprocess_data(config):
                     break
 
             if dialogue_history != "":
-                #'<s>' only for CausalLM models
+                # '<s>' only for CausalLM models
                 if is_causal_lm:
                     context.append('<s>' + your_persona + dialogue_history)
                 else:
                     context.append(your_persona + dialogue_history)
                 labels.append(dialogue_history)
 
-    return{
-        "context": context, 
+    return {
+        "context": context,
         "labels": labels
         }

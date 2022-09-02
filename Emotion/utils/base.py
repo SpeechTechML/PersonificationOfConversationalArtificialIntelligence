@@ -8,12 +8,12 @@ from transformers.file_utils import is_torch_available
 
 
 def set_seed(seed: int):
-    
     """
-    Helper function for reproducible behavior to set the seed in "random", "numpy", "torch".
+    Helper function for reproducible behavior
+    to set the seed in "random", "numpy", "torch".
 
     Args:
-        seed (int): 
+        seed (int):
             The seed to set.
     """
 
@@ -25,7 +25,7 @@ def set_seed(seed: int):
 
 
 def str_to_python(input_content_str: str):
-    """ 
+    """
     Converts pythonic content surrounded by string literal into just content.
     '[a, b, c]' -> [a, b, c]
     """

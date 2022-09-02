@@ -8,10 +8,10 @@ from transformers import MarianTokenizer, AutoModelForSeq2SeqLM
 class RusEngTranslator:
     def __init__(
         self,
-        mt_config: DictConfig, 
+        mt_config: DictConfig,
         kind: Literal['ru_en', 'en_ru'] = 'ru_en',
         device: str = 'cuda:0'
-        ):
+    ):
 
         self._device = device
         model_name = mt_config['name'][kind]
@@ -28,7 +28,8 @@ class RusEngTranslator:
 
         self._switch_device()
 
-        input_ids = self.tokenizer.encode(text, return_tensors='pt').to(self._device)
+        input_ids = self.tokenizer.encode(text,
+                                          return_tensors='pt').to(self._device)
         outputs = self.translator.generate(input_ids)
         decoded = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
@@ -36,11 +37,11 @@ class RusEngTranslator:
         return decoded
 
     def translate_texts(
-        self, 
-        texts: List[str], 
-        verbose: bool = False, 
+        self,
+        texts: List[str],
+        verbose: bool = False,
         desc: str = ''
-        ) -> List[str]:
+    ) -> List[str]:
         """ Translates list of texts """
 
         self._switch_device()
@@ -50,12 +51,14 @@ class RusEngTranslator:
 
         decoded_texts = []
         for text in texts:
-            input_ids = self.tokenizer.encode(text, return_tensors='pt').to(self._device)
+            input_ids = self.tokenizer.encode(text, return_tensors='pt'
+                                              ).to(self._device)
             outputs = self.translator.generate(input_ids)
 
             sents = []
             for output in outputs:
-                decoded = self.tokenizer.decode(output, skip_special_tokens=True)
+                decoded = self.tokenizer.decode(output,
+                                                skip_special_tokens=True)
                 sents.append(decoded)
             sents = " ".join(sents)
             decoded_texts.append(sents)

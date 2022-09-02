@@ -7,10 +7,11 @@ def generate_answers(model, tokenizer):
     model.to(device)
 
     persona = ["Я программист",
-            "Живу в Ростове",
-            "Не умею играть на гитаре",
-            "Обожаю готовить",
-            "Не люблю кошек"]
+               "Живу в Ростове",
+               "Не умею играть на гитаре",
+               "Обожаю готовить",
+               "Не люблю кошек"
+               ]
 
     personas = ["<per>Я программист<per>Живу в Ростове<per>Не умею играть на гитаре<per>Работаю два дня<per>Не люблю кошек",
                 "<per>Я домохозяйка<per>Вышла замуж после школы<per>Есть двое детей<per>Обожаю готовить<per>Мечтаю об отпуске"]
@@ -32,8 +33,8 @@ def generate_answers(model, tokenizer):
     for i in range(5):
         outs.append(model.generate(
             inputs,
-            #min_length=5,
-            #max_length=25,
+            # min_length=5,
+            # max_length=25,
             do_sample=True,
             temperature=1.0,
             top_k=100,
@@ -59,8 +60,8 @@ def start_dialogue(model, tokenizer, other_token, you_token):
         inputs = tokenizer.encode(dialogue_session, return_tensors="pt").to(device)
         outputs = model.generate(
             inputs,
-            #min_length=5,
-            #max_length=25,
+            # min_length=5,
+            # max_length=25,
             do_sample=True,
             temperature=1.0,
             top_p=0.9,

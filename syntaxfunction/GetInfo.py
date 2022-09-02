@@ -3,6 +3,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import pos_tag, Text
 from collections import Counter
 
+
 def rli(inp):
     splt = inp.split(' ')
     if splt[0].isdigit():
@@ -41,6 +42,7 @@ def bild_enpersonachat(raw):
             result.append(json.dumps({'context': context, 'responce': responce, 'persona': persona, 'label': 1}) + '\n')
     return result
 
+
 dialogs = bild_enpersonachat("test_both_original.txt")
 persons = []
 for i in range(len(dialogs)):
@@ -51,7 +53,7 @@ for i in range(len(dialogs)):
     count_noun = 0
     count_verb = 0
     for dialog in dialogs:
-        if (json.loads(dialogs[i])["persona"]==json.loads(dialog)["persona"]):
+        if (json.loads(dialogs[i])["persona"] == json.loads(dialog)["persona"]):
             count_sent += len(sent_tokenize(str(json.loads(dialog)["responce"])))
             count_word += len(word_tokenize(str(json.loads(dialog)["responce"])))
             count_rep += 1
@@ -83,7 +85,7 @@ for i in range(len(dialogs)):
             except:
                 pass
             persons_chr.append(str(json.loads(dialog)["responce"]))
-    persons.append({"name": str(i), "sentence": count_sent/count_rep, "word": count_word/count_rep, "noun": count_noun/count_rep, "verb": count_verb/count_rep })
+    persons.append({"name": str(i), "sentence": count_sent/count_rep, "word": count_word/count_rep, "noun": count_noun/count_rep, "verb": count_verb/count_rep})
 
 for person in persons:
     with open("persons.json", "a") as file:

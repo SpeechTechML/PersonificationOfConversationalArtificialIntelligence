@@ -9,11 +9,11 @@ class LabelEncoderWithFitCheck(LabelEncoder):
         super(LabelEncoderWithFitCheck, self).__init__(*args, **kwargs)
         self._save_dir = save_dir
         self._is_fitted = False
-        
+
     @property
     def is_fitted(self):
         return self._is_fitted
-    
+
     def fit(self, y):
         self._is_fitted = True
         return super().fit(y)

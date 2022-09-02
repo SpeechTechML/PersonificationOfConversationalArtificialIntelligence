@@ -1,4 +1,3 @@
-import os
 import argparse
 from typing import List
 from omegaconf import DictConfig, OmegaConf
@@ -12,7 +11,8 @@ class EDATask(Task):
     def __init__(self, config: DictConfig):
         pass
 
-    def _plot_label_dist(self, dataframes_list: List[pd.DataFrame], save_path: str):
+    def _plot_label_dist(self, dataframes_list: List[pd.DataFrame],
+                         save_path: str):
         pass
 
     def run(self):

@@ -6,7 +6,9 @@ import numpy as np
 from thefuzz import process
 import os
 import csv
+
 attacker = OpenAttack.attackers.SCPNAttacker()
+
 
 # CoreNlp Russian https://github.com/MANASLU8/CoreNLP.git
 def get_dialog(inp, mod):
@@ -41,25 +43,28 @@ def bild_rupersonachat(raw):
                         .replace('<span class=participant_2>Пользователь 2: ', p2 + '[-sep-]').split('[-sep-]')
                 except BaseException:
                     print(conv)
-                    C = 'a'
                     break
 
                 persona = persona.replace('</span>', '').split('<br />')[:-1]
                 result.append(json.dumps({'context': context, 'responce': responce, 'persona': persona, 'label': 1}))
     return result
 
+
 def GetConsistuencyTemplate(sentence):
-    get_parse = nlp.annotate(sentence, properties={'annotators': 'parse','outputFormat': 'json'})
+    nlp = StanfordCoreNLP('http://localhost:9000')
+    get_parse = nlp.annotate(sentence, properties={'annotators': 'parse', 'outputFormat': 'json'})
     consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
     return tree_template + " EOP"
+
 
 def GetAllTemplates(dialogs):
     all_templates = []
     i = 0
     for i in range(len(dialogs)):
         all_templates.append(GetConsistuencyTemplate(json.loads(dialogs[i])['responce']))
-    return  all_templates
+    return all_templates
+
 
 def SaveReplicsNumberByPerson(dialogs):
     persons = {}
@@ -67,7 +72,7 @@ def SaveReplicsNumberByPerson(dialogs):
         values = []
         print(i)
         for j in range(len(dialogs)):
-            if j!=i:
+            if j != i:
                 try:
                     if json.loads(dialogs[i])['persona'] == json.loads(dialogs[j])['persona']:
                         values.append(j)
@@ -89,12 +94,13 @@ i = 0
 for i in range(len(dialogs)):
     responce_templates = []
     for number in number_dictionary[i]:
-      responce_templates.append(templates[number])
+        responce_templates.append(templates[number])
     responce_templates = process.dedupe(responce_templates, threshold=98)
     if len(responce_templates) >= 5:
         responce_templates = responce_templates[0:4]
     dialog_line = json.loads(dialogs[i])
-    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'],
+                                                          responce_templates)
     sorted_json = json.dumps(dialog_line, sort_keys=True)
     with open("aug_toloka/russian_aug.json", 'a') as result:
-        result.write(sorted_json +'\n')
+        result.write(sorted_json + '\n')
