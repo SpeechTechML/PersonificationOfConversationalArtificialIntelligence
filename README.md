@@ -1,8 +1,6 @@
 # Personification Of Conversational Artificial Intelligence
 ![logo](./docs/img/horizontal_on_white_by_logaster.png)
 
-![Build status](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence)
-
 This repository contains the methods and algorithms for the personification of conversational artificial intelligence.
 
 The methods in the projects can be used to develop a personalized conversational agent to improve human-machine interaction with students.
@@ -15,9 +13,13 @@ There are 5 different algorithms in the project:
 * [emotion recognition algorithm](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели).
 
 ## Demo
+Implementation of a dialog chat bot using personification methods
 
+![img](./docs/img/img.png)
 
+Results of augmented data 
 
+![img](./docs/img/Augdata.png)
 ## Documentation
 [Installation guide](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-установке)
 
@@ -26,7 +28,7 @@ There are 5 different algorithms in the project:
 [Home documentation page](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki)
 
 ## Examples
-[Refine model example](./docs/examples/Refine model with toloka.ipynb)
+[Refine model example](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/blob/main/docs/examples/Refine%20model%20with%20toloka.ipynb)
 
 [Retrieval model example](https://colab.research.google.com/drive/16U_A6aig71X6NOyM6iGgsNE7m68_f9zi?usp=sharing)
 
