@@ -1,5 +1,6 @@
 from Augmentation.ru import bild_rupersonachat, get_dialog, SaveReplicsNumberByPerson, GetAllTemplates
 import os
+import pytest
 
 
 @pytest.mark.skip(reason="need windows")

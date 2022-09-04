@@ -1,6 +1,7 @@
 from Augmentation.en import GetConsistuencyTemplate, GetAllTemplates, rli, bild_enpersonachat, SaveReplicsNumberByPerson
 import json
 import os
+import pytest
 
 
 @pytest.mark.skip(reason="need windows")
