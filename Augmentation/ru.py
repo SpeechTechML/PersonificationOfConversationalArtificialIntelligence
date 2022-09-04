@@ -6,11 +6,12 @@ import numpy as np
 from thefuzz import process
 import os
 import csv
-
 attacker = OpenAttack.attackers.SCPNAttacker()
-
+nlp = StanfordCoreNLP('http://localhost:9000')
 
 # CoreNlp Russian https://github.com/MANASLU8/CoreNLP.git
+
+
 def get_dialog(inp, mod):
     if inp[0] == '"':
         inp = inp[1:]
@@ -43,6 +44,7 @@ def bild_rupersonachat(raw):
                         .replace('<span class=participant_2>Пользователь 2: ', p2 + '[-sep-]').split('[-sep-]')
                 except BaseException:
                     print(conv)
+                    C = 'a'
                     break
 
                 persona = persona.replace('</span>', '').split('<br />')[:-1]
@@ -51,7 +53,6 @@ def bild_rupersonachat(raw):
 
 
 def GetConsistuencyTemplate(sentence):
-    nlp = StanfordCoreNLP('http://localhost:9000')
     get_parse = nlp.annotate(sentence, properties={'annotators': 'parse', 'outputFormat': 'json'})
     consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
@@ -76,31 +77,35 @@ def SaveReplicsNumberByPerson(dialogs):
                 try:
                     if json.loads(dialogs[i])['persona'] == json.loads(dialogs[j])['persona']:
                         values.append(j)
-                except:
+                except (Exception, ):
                     pass
         persons[i] = values
     np.save('persons_ru.npy', persons)
 
 
-dialogs = bild_rupersonachat("dialogues.tsv")
-if os.path.isfile("persons.npy"):
-    number_dictionary = np.load('persons_ru.npy', allow_pickle='TRUE').item()
-else:
-    SaveReplicsNumberByPerson(dialogs)
-    number_dictionary = np.load('persons_ru.npy', allow_pickle='TRUE').item()
+def main():
+    dialogs = bild_rupersonachat("dialogues.tsv")
+    if os.path.isfile("persons.npy"):
+        number_dictionary = np.load('persons_ru.npy', allow_pickle='TRUE').item()
+    else:
+        SaveReplicsNumberByPerson(dialogs)
+        number_dictionary = np.load('persons_ru.npy', allow_pickle='TRUE').item()
 
-templates = GetAllTemplates(dialogs)
-i = 0
-for i in range(len(dialogs)):
-    responce_templates = []
-    for number in number_dictionary[i]:
-        responce_templates.append(templates[number])
-    responce_templates = process.dedupe(responce_templates, threshold=98)
-    if len(responce_templates) >= 5:
-        responce_templates = responce_templates[0:4]
-    dialog_line = json.loads(dialogs[i])
-    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'],
-                                                          responce_templates)
-    sorted_json = json.dumps(dialog_line, sort_keys=True)
-    with open("aug_toloka/russian_aug.json", 'a') as result:
-        result.write(sorted_json + '\n')
+    templates = GetAllTemplates(dialogs)
+    i = 0
+    for i in range(len(dialogs)):
+        responce_templates = []
+        for number in number_dictionary[i]:
+            responce_templates.append(templates[number])
+        responce_templates = process.dedupe(responce_templates, threshold=98)
+        if len(responce_templates) >= 5:
+            responce_templates = responce_templates[0:4]
+        dialog_line = json.loads(dialogs[i])
+        dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        sorted_json = json.dumps(dialog_line, sort_keys=True)
+        with open("aug_toloka/russian_aug.json", 'a') as result:
+            result.write(sorted_json + '\n')
+
+
+if __name__ == "__main__":
+    main()

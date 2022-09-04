@@ -68,37 +68,40 @@ def SaveReplicsNumberByPerson(dialogs):
     persons = {}
     for i in range(len(dialogs)):
         values = []
-        print(i)
         for j in range(len(dialogs)):
             if j != i:
                 try:
                     if json.loads(dialogs[i])['persona'] == json.loads(dialogs[j])['persona']:
                         values.append(j)
-                except:
+                except (Exception,):
                     pass
         persons[i] = values
     np.save('persons.npy', persons)
 
 
-dialogs = bild_enpersonachat("personachat/test_both_original.txt")
-if os.path.isfile("persons.npy"):
-    number_dictionary = np.load('persons.npy', allow_pickle='TRUE').item()
-else:
-    SaveReplicsNumberByPerson(dialogs)
-    number_dictionary = np.load('persons.npy', allow_pickle='TRUE').item()
+def main():
+    dialogs = bild_enpersonachat("personachat/test_both_original.txt")
+    if os.path.isfile("persons.npy"):
+        number_dictionary = np.load('persons.npy', allow_pickle='TRUE').item()
+    else:
+        SaveReplicsNumberByPerson(dialogs)
+        number_dictionary = np.load('persons.npy', allow_pickle='TRUE').item()
 
-templates = GetAllTemplates(dialogs)
-i = 0
-for i in range(len(dialogs)):
-    responce_templates = []
-    for number in number_dictionary[i]:
-        responce_templates.append(templates[number])
-    responce_templates = process.dedupe(responce_templates, threshold=98)
-    if len(responce_templates) >= 5:
-        responce_templates = responce_templates[0:4]
-    dialog_line = json.loads(dialogs[i])
-    dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'],
-                                                          responce_templates)
-    sorted_json = json.dumps(dialog_line, sort_keys=True)
-    with open("aug_personachat/test_both_original_aug.json", 'a') as result:
-        result.write(sorted_json + '\n')
+    templates = GetAllTemplates(dialogs)
+    i = 0
+    for i in range(len(dialogs)):
+        responce_templates = []
+        for number in number_dictionary[i]:
+            responce_templates.append(templates[number])
+        responce_templates = process.dedupe(responce_templates, threshold=98)
+        if len(responce_templates) >= 5:
+            responce_templates = responce_templates[0:4]
+        dialog_line = json.loads(dialogs[i])
+        dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        sorted_json = json.dumps(dialog_line, sort_keys=True)
+        with open("aug_personachat/test_both_original_aug.json", 'a') as result:
+            result.write(sorted_json + '\n')
+
+
+if __name__ == "__main__":
+    main()
