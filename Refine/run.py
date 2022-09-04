@@ -2,9 +2,9 @@ import torch
 from transformers import AutoTokenizer
 from transformers import AutoModelForSeq2SeqLM, AutoModelForCausalLM
 
-from data_loader import preprocess_data
-from dataset import TextDataset, collate_fn
-from train import train_model, eval_model, config_training
+from Refine.data.data_loader import preprocess_data
+from Refine.dataset import TextDataset, collate_fn
+from Refine.train import train_model, eval_model, config_training
 
 
 def init_config(model_name, is_causal_lm, max_length):
