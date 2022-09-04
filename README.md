@@ -5,9 +5,25 @@
 
 This repository contains the methods and algorithms for the personification of conversational artificial intelligence.
 
+The methods in the projects can be used to develop a personalized conversational agent to improve human-machine interaction with students.
+
+There are 5 different algorithms in the project:
+* [text data augmentation that preserves individual speech patterns and vocabulary](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#Аугментация-с-сохранением-отличительных-характеристик-речи-человека);
+* [algorithm for analyzing lexical and syntactic constructions with the ability to determine authorship](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#Анализ-лексических-и-синтаксических-конструкций);
+* [personalized refine dialogue model](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#refine-модели);
+* [personalized retrieval dialogue model](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели);
+* [emotion recognition algorithm](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели).
+
 ## Demo
 
+
+
 ## Documentation
+[Installation guide](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-установке)
+
+[Usage](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-использованию)
+
+[Home documentation page](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki)
 
 ## Examples
 [Refine model example](./docs/examples/Refine model with toloka.ipynb)
