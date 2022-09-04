@@ -1,14 +1,37 @@
-# PersonificationSystem
-## Retrieval models
+# Personification Of Conversational Artificial Intelligence
+![logo](./docs/img/horizontal_on_white_by_logaster.png)
 
-Toloka RU PersonaChat:
-|       Model       |   **R@1**  |   **R@2**  |  **R@5**   |  **R@10**  |  **MRR**   |
-| :---------------: | :--------: | :--------: | :--------: | :--------: | :--------: |
-|    Bi-Encoder     |   0.532    |   0.701    |   0.889    |   0.988     |   0.683472    |
-|Bi-Encoder persona len128|   0.528    |   0.707    |   0.889    |   0.988     |   0.68361    |
-|Bi-Encoder persona len 196|   0.559    |   0.719    |   0.888    |   0.984     |   0.7015620851370851    |
-|Bi-Encoder persona len 196 [P]|   0.577    |   0.751    |   0.893    |   0.988     |   0.7177920995670996    |
-| Poly-Encoder  16  |   0.573    |   0.713    |   0.888    |    0.982    |    0.705825   |
-| Poly-Encoder  64  |   0.52    |   0.683    |   0.871    |    0.977    |   0.67    |
-| Poly-Encoder  360 |   0.538    |   0.719    |   0.893    |    0.981    |   	0.688855    |
+![Build status](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence)
 
+This repository contains the methods and algorithms for the personification of conversational artificial intelligence.
+
+The methods in the projects can be used to develop a personalized conversational agent to improve human-machine interaction with students.
+
+There are 5 different algorithms in the project:
+* [text data augmentation that preserves individual speech patterns and vocabulary](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#Аугментация-с-сохранением-отличительных-характеристик-речи-человека);
+* [algorithm for analyzing lexical and syntactic constructions with the ability to determine authorship](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#Анализ-лексических-и-синтаксических-конструкций);
+* [personalized refine dialogue model](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#refine-модели);
+* [personalized retrieval dialogue model](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели);
+* [emotion recognition algorithm](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели).
+
+## Demo
+
+
+
+## Documentation
+[Installation guide](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-установке)
+
+[Usage](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-использованию)
+
+[Home documentation page](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki)
+
+## Examples
+[Refine model example](./docs/examples/Refine model with toloka.ipynb)
+
+[Retrieval model example](https://colab.research.google.com/drive/16U_A6aig71X6NOyM6iGgsNE7m68_f9zi?usp=sharing)
+
+## Citation
+
+P. Posokhov, K. Apanasovich, A. Matveeva, O. Makhnytkina and A. Matveev, "Personalizing Dialogue Agents for Russian: Retrieve and Refine," 2022 31st Conference of Open Innovations Association (FRUCT), 2022, pp. 245-252, doi: 10.23919/FRUCT54823.2022.9770895.
+
+Posokhov P.A., Skrylnikov S.S., Makhnytkina O.V. Artificial text detection in Russian language: a BERT-based Approach. Компьютерная лингвистика и интеллектуальные технологии = Computational Linguistics and Intellectual Technologies [Komp'juternaja Lingvistika i Intellektual'nye Tehnologii]. 2022. No. 21. pp. 470-476.
