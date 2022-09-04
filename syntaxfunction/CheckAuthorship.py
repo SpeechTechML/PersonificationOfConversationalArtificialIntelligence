@@ -4,7 +4,8 @@ import json
 from collections import Counter
 import sys
 import getopt
-
+import nltk
+nltk.download('punkt')
 
 def main(argv):
     replica = ""
