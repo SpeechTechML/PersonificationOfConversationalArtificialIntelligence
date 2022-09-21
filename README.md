@@ -13,12 +13,17 @@ There are 5 different algorithms in the project:
 * [emotion recognition algorithm](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki#retrieval-модели).
 
 ## Demo
-Implementation of a dialog chat bot using personification methods
+Demonstration of retrieval model implementation in the dialog chat bot.
 
-![img](./docs/img/img.png)
+Demonstration of training the retrieval model.
 
-Results of augmented data 
 
+Demonstration of using the algorithm for analyzing lexical and syntactic constructions with the possibility of determining authorship.
+
+
+Demonstration of augmentation.
+
+Results of augmented data
 ![img](./docs/img/Augdata.png)
 ## Documentation
 [Installation guide](https://github.com/SpeechTechML/PersonificationOfConversationalArtificialIntelligence/wiki/Руководство-по-установке)

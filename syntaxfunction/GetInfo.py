@@ -106,7 +106,7 @@ def main(argv):
 
     for person in persons:
         with open(arg_output, "a") as file:
-            file.write(str(person) + "\n")
+            file.write(str(person).replace("'",'"') + "\n")
     return persons
 
 

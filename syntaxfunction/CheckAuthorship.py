@@ -62,6 +62,7 @@ def main(argv):
             if sum_futures < sum_diff:
                 sum_diff = sum_futures
                 name = str(json.loads(line)["name"])
+    print(f'This replica looks like {name} person')
     return f'This replica looks like {name} person'
 
 
