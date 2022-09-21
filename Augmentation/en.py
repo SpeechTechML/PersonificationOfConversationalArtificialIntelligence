@@ -3,16 +3,16 @@ import json
 import re
 import OpenAttack
 import numpy as np
-from thefuzz import process
 import os
 
+script_path = os.path.dirname(__file__)
 nlp = StanfordCoreNLP('http://localhost:9000')
 attacker = OpenAttack.attackers.SCPNAttacker()
 
 
 def GetConsistuencyTemplate(sentence):
     get_parse = nlp.annotate(sentence, properties={'annotators': 'parse', 'outputFormat': 'json'})
-    consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
+    consistuency_tree = get_parse['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
     return tree_template + " EOP"
 
@@ -80,7 +80,7 @@ def SaveReplicsNumberByPerson(dialogs):
 
 
 def main():
-    dialogs = bild_enpersonachat("personachat/test_both_original.txt")
+    dialogs = bild_enpersonachat(f'{script_path}/personachat/test_both_original.txt')
     if os.path.isfile("persons.npy"):
         number_dictionary = np.load('persons.npy', allow_pickle='TRUE').item()
     else:
@@ -92,14 +92,19 @@ def main():
     for i in range(len(dialogs)):
         responce_templates = []
         for number in number_dictionary[i]:
-            responce_templates.append(templates[number])
-        responce_templates = process.dedupe(responce_templates, threshold=98)
+            responce_templates.append((templates[number].replace("(", "( ")).replace("?", ""))
         if len(responce_templates) >= 5:
             responce_templates = responce_templates[0:4]
         dialog_line = json.loads(dialogs[i])
-        dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        try:
+            dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        except:
+            pass
         sorted_json = json.dumps(dialog_line, sort_keys=True)
-        with open("aug_personachat/test_both_original_aug.json", 'a') as result:
+        check_file = os.path.exists(f'{script_path}/aug_personachat/test_both_original_aug.json')
+        if check_file is False:
+            os.mkdir(f'{script_path}/aug_personachat')
+        with open(f'{script_path}/aug_personachat/test_both_original_aug.json', 'a') as result:
             result.write(sorted_json + '\n')
 
 

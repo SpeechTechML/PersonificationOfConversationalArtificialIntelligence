@@ -3,9 +3,10 @@ import json
 import re
 import OpenAttack
 import numpy as np
-from thefuzz import process
 import os
 import csv
+
+script_path = os.path.dirname(__file__)
 attacker = OpenAttack.attackers.SCPNAttacker()
 nlp = StanfordCoreNLP('http://localhost:9000')
 
@@ -54,7 +55,7 @@ def bild_rupersonachat(raw):
 
 def GetConsistuencyTemplate(sentence):
     get_parse = nlp.annotate(sentence, properties={'annotators': 'parse', 'outputFormat': 'json'})
-    consistuency_tree = json.loads(get_parse)['sentences'][0]['parse']
+    consistuency_tree = get_parse['sentences'][0]['parse']
     tree_template = ' '.join([word for word in ((re.sub('\s+', " ", consistuency_tree)).replace(")", " )")).split(' ') if (word != "I" and (not word.islower()))])
     return tree_template + " EOP"
 
@@ -84,7 +85,7 @@ def SaveReplicsNumberByPerson(dialogs):
 
 
 def main():
-    dialogs = bild_rupersonachat("dialogues.tsv")
+    dialogs = bild_rupersonachat(f'{script_path}/tolokaPersonachat/dialogues.tsv')
     if os.path.isfile("persons.npy"):
         number_dictionary = np.load('persons_ru.npy', allow_pickle='TRUE').item()
     else:
@@ -96,13 +97,18 @@ def main():
     for i in range(len(dialogs)):
         responce_templates = []
         for number in number_dictionary[i]:
-            responce_templates.append(templates[number])
-        responce_templates = process.dedupe(responce_templates, threshold=98)
+            responce_templates.append((templates[number].replace("(", "( ")).replace("?", ""))
         if len(responce_templates) >= 5:
             responce_templates = responce_templates[0:4]
         dialog_line = json.loads(dialogs[i])
-        dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        try:
+            dialog_line['responce_aug'] = attacker.gen_paraphrase(dialog_line['responce'], responce_templates)
+        except:
+            pass
         sorted_json = json.dumps(dialog_line, sort_keys=True)
+        check_file = os.path.exists(f'{script_path}/aug_toloka/russian_aug.json')
+        if check_file is False:
+            os.mkdir(f'{script_path}/aug_toloka')
         with open("aug_toloka/russian_aug.json", 'a') as result:
             result.write(sorted_json + '\n')
 
