@@ -14,15 +14,15 @@ There are 5 different algorithms in the project:
 
 ## Demo
 Demonstration of retrieval model implementation in the dialog chat bot.
-
+![alt text](./docs/img/chat-bot.gif)
 Demonstration of training the retrieval model.
-
-
+![alt text](./docs/img/retrieval.gif)
+[This video with voice over](https://drive.google.com/file/d/1G-DK1jnSioqfu_0uzetDEk6m30UNPDj5/view?usp=sharing).
 Demonstration of using the algorithm for analyzing lexical and syntactic constructions with the possibility of determining authorship.
-
-
+![alt text](./docs/img/lexical.gif)
 Demonstration of augmentation.
 
+![alt text](./docs/img/augmentation.gif)
 Results of augmented data
 ![img](./docs/img/Augdata.png)
 ## Documentation
