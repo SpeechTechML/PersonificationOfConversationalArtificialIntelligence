@@ -18,6 +18,14 @@ Demonstration of retrieval model implementation in the dialog chat bot.
 Demonstration of training the retrieval model.
 ![alt text](./docs/img/retrieval.gif)
 [This video with voice over](https://drive.google.com/file/d/1G-DK1jnSioqfu_0uzetDEk6m30UNPDj5/view?usp=sharing).
+
+
+Demonstration of training the refine model.
+![Refine_train_demo](https://user-images.githubusercontent.com/106475151/191513140-3c94dedb-f0e9-4169-9d27-118c2f06cf70.gif)
+
+Demonstration of using the refine model.
+![Refine_test_demo](https://user-images.githubusercontent.com/106475151/191513266-6a4bfd8d-ca44-45c5-9b76-b28d9c735d51.gif)
+
 Demonstration of using the algorithm for analyzing lexical and syntactic constructions with the possibility of determining authorship.
 ![alt text](./docs/img/lexical.gif)
 Demonstration of augmentation.
